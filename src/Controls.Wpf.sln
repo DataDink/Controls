@@ -1,0 +1,26 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio 2012
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Controls.Wpf", "Controls.Wpf\Controls.Wpf.csproj", "{19455010-8C59-4042-B9A8-F36853951E39}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Controls", "Controls\Controls.csproj", "{1BF993D8-5019-45A3-8B47-27DDEC3E4C6B}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{19455010-8C59-4042-B9A8-F36853951E39}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{19455010-8C59-4042-B9A8-F36853951E39}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{19455010-8C59-4042-B9A8-F36853951E39}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{19455010-8C59-4042-B9A8-F36853951E39}.Release|Any CPU.Build.0 = Release|Any CPU
+		{1BF993D8-5019-45A3-8B47-27DDEC3E4C6B}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{1BF993D8-5019-45A3-8B47-27DDEC3E4C6B}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{1BF993D8-5019-45A3-8B47-27DDEC3E4C6B}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{1BF993D8-5019-45A3-8B47-27DDEC3E4C6B}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+EndGlobal
