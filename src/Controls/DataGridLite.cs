@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Windows;
 using System.Windows.Controls.Primitives;
+using System.Windows.Input;
 using System.Windows.Markup;
 using System.Windows.Media;
 using Controls.Collections;
@@ -14,6 +15,7 @@ namespace Controls
     [ContentProperty("Columns")]
     public class DataGridLite : FrameworkElement, IContentHost<LiteColumn>, IContentHost<LiteRow>, IContentHost<UIElement>
     {
+        #region DependencyProperties
         public static readonly DependencyProperty HeaderHeightProperty = DependencyProperty.Register("HeaderHeight", typeof (double), typeof (DataGridLite), new PropertyMetadata(30d));
         public double HeaderHeight { get { return (double) GetValue(HeaderHeightProperty); } set { SetValue(HeaderHeightProperty, value); } }
 
@@ -52,6 +54,7 @@ namespace Controls
         public static readonly DependencyPropertyKey IsSelectedProperty = DependencyProperty.RegisterAttachedReadOnly("IsSelected", typeof(bool), typeof(DataGridLite), new PropertyMetadata());
         public static bool GetIsSelected(DependencyObject child) { return (bool)child.GetValue(IsSelectedProperty.DependencyProperty); }
         private static void SetIsSelected(DependencyObject child, bool value) { child.SetValue(IsSelectedProperty, value); }
+        #endregion
 
         public DataGridLite()
         {
@@ -64,6 +67,9 @@ namespace Controls
             AddLogicalChild(_scrollbar);
             AddVisualChild(_scrollbar);
             _scrollbar.Scroll += OnScroll;
+            MouseUp += GridMouseUp;
+            MouseDown += GridMouseDown;
+            MouseWheel += GridMouseWheel;
         }
 
         protected override void OnPropertyChanged(DependencyPropertyChangedEventArgs e)
@@ -87,6 +93,7 @@ namespace Controls
             if (e.Property == SelectedCellsProperty) SetSelection(null, null, null, SelectedCells.ToArray());
         }
 
+        #region Content Hosting
         private readonly ContentCollection<LiteColumn> _columns;
         public ContentCollection<LiteColumn> Columns { get { return _columns; } } 
 
@@ -146,6 +153,7 @@ namespace Controls
         {
             foreach (var cell in cells) {
                 SetGrid(cell, this);
+                cell.MouseMove += CellMouseMove;
             }
         }
 
@@ -153,6 +161,7 @@ namespace Controls
         {
             foreach (var cell in cells) {
                 SetGrid(cell, null);
+                cell.MouseMove -= CellMouseMove;
             }
         }
 
@@ -168,7 +177,9 @@ namespace Controls
 
             return _columns.Select(c => double.IsNaN(c.Width) ? unmeasuredWidth : c.Width).ToArray();
         }
+        #endregion
 
+        #region Rendering
         private readonly ContentCollection<UIElement> _headerCells; 
 
         protected virtual void PositionHeaderCells(double width)
@@ -262,6 +273,96 @@ namespace Controls
 
         }
 
+        protected override Size ArrangeOverride(Size finalSize)
+        {
+            PositionHeaderCells(finalSize.Width);
+            PositionRows(finalSize.Width);
+            PositionScroll(finalSize.Width);
+            return finalSize;
+        }
+        protected virtual IEnumerable<UIElement> VisualChildren { get { return _headerCells.Concat(_rows).Concat(new[] { _scrollbar }); } }
+        protected override Visual GetVisualChild(int index) { return VisualChildren.ToArray()[index]; }
+        protected override int VisualChildrenCount { get { return VisualChildren.Count(); } }
+        #endregion
+
+        #region Selection
+        private bool _mouseIsSelecting;
+        private UIElement _selectAnchor = null;
+
+        private UIElement GetCellElement(UIElement element)
+        {
+            while (element != null && !(VisualTreeHelper.GetParent(element) is LiteRow)) {
+                element = VisualTreeHelper.GetParent(element) as UIElement;
+            }
+            return element;
+        }
+
+        private void CellMouseMove(object sender, MouseEventArgs e)
+        {
+            if (_mouseIsSelecting) {
+                var cell = GetCellElement(sender as UIElement);
+                if (cell == null) return;
+                if (_selectAnchor == null) _selectAnchor = GetCellElement(cell);
+                if (_selectAnchor.Equals(cell)) {
+                    SelectedCells = new[] {cell};
+                    return;
+                }
+
+                var allRows = _rows.ToList();
+                var startRow = LiteRow.GetRow(_selectAnchor);
+                var endRow = LiteRow.GetRow(cell);
+                var startRowIndex = allRows.IndexOf(startRow);
+                var endRowIndex = allRows.IndexOf(endRow);
+                var rowFromIndex = Math.Min(startRowIndex, endRowIndex);
+                var rowToIndex = Math.Max(startRowIndex, endRowIndex);
+
+                var startCellIndex = startRow.Cells.IndexOf(_selectAnchor);
+                var endCellIndex = endRow.Cells.IndexOf(cell);
+                var cellFromIndex = Math.Min(startCellIndex, endCellIndex);
+                var cellToIndex = Math.Max(startCellIndex, endCellIndex);
+
+                var selection = new List<UIElement>();
+                for (var r = rowFromIndex; r <= rowToIndex; r++) {
+                    var selectRow = allRows[r];
+                    for (var c = cellFromIndex; c <= cellToIndex; c++) {
+                        var selectCell = selectRow.Cells[c];
+                        selection.Add(selectCell);
+                    }
+                }
+
+                selection.Remove(cell);
+                selection.Insert(0, cell);
+                SelectedCells = selection;
+            };
+        }
+
+        private void GridMouseUp(object sender, MouseEventArgs e)
+        {
+            e.MouseDevice.Capture(null);
+            _mouseIsSelecting = false;
+        }
+
+        private void GridMouseDown(object sender, MouseEventArgs e)
+        {
+            _selectAnchor = GetCellElement(e.OriginalSource as UIElement);
+            if (_selectAnchor != null) SelectedCells = new[] {_selectAnchor};
+            e.MouseDevice.Capture(this, CaptureMode.SubTree);
+            _mouseIsSelecting = true;
+        }
+
+        private void GridMouseWheel(object sender, MouseWheelEventArgs e)
+        {
+            if (e.Delta > 0) {
+                var value = _scrollbar.Value - _scrollbar.Maximum * .025;
+                _scrollbar.Value = value;
+                _scrollbar.RaiseEvent(new ScrollEventArgs(ScrollEventType.LargeDecrement, value));
+            } else if (e.Delta < 0) {
+                var value = _scrollbar.Value + _scrollbar.Maximum * .025;
+                _scrollbar.Value = value;
+                _scrollbar.RaiseEvent(new ScrollEventArgs(ScrollEventType.LargeIncrement, value));
+            }
+        }
+
         private bool _configuringSelection = false;
         private void SetSelection(object[] items, LiteRow[] rows, LiteColumn[] columns, UIElement[] cells)
         {
@@ -320,17 +421,7 @@ namespace Controls
 
             _configuringSelection = false;
         }
-
-        protected override Size ArrangeOverride(Size finalSize)
-        {
-            PositionHeaderCells(finalSize.Width);
-            PositionRows(finalSize.Width);
-            PositionScroll(finalSize.Width);
-            return finalSize;
-        }
-        protected virtual IEnumerable<UIElement> VisualChildren { get { return _headerCells.Concat(_rows).Concat(new[] {_scrollbar}); } }
-        protected override Visual GetVisualChild(int index) { return VisualChildren.ToArray()[index]; }
-        protected override int VisualChildrenCount { get { return VisualChildren.Count(); } }
+        #endregion
     }
 
     [Flags]

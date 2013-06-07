@@ -32,7 +32,7 @@
     <DockPanel>
         <Button DockPanel.Dock="Top" Click="Button_Click">Select</Button>
         <U:DataGridLite Margin="10" 
-                        SelectionMode="MultiRow,MultiColumn"
+                        SelectionMode="MultiRow"
                         Items="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType=L:MainWindow}, Path=Items}"
                         DockPanel.Dock="Left">
             <U:LiteColumn Title="Column 1" DataMember="Value1" CellTemplate="{StaticResource LiteCell}"/>
