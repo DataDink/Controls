@@ -1,9 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Linq;
 using System.Text;
 using System.Windows;
 using System.Windows.Controls.Primitives;
+using System.Windows.Data;
 using System.Windows.Input;
 using System.Windows.Markup;
 using System.Windows.Media;
@@ -67,6 +69,17 @@ namespace Controls
             AddLogicalChild(_scrollbar);
             AddVisualChild(_scrollbar);
             _scrollbar.Scroll += OnScroll;
+            _scrollbar.SetBinding(RangeBase.SmallChangeProperty, new Binding {
+                Path = new PropertyPath("RowHeight"),
+                Source = this,
+                Mode = BindingMode.OneWay,
+            });
+            _scrollbar.SetBinding(RangeBase.LargeChangeProperty, new Binding {
+                Path = new PropertyPath("Maximum"),
+                Source = _scrollbar,
+                Mode = BindingMode.OneWay,
+                Converter = new ScrollStepConverter { Multiplier = .1 }
+            });
             MouseUp += GridMouseUp;
             MouseDown += GridMouseDown;
             MouseWheel += GridMouseWheel;
@@ -422,6 +435,22 @@ namespace Controls
             _configuringSelection = false;
         }
         #endregion
+
+        private class ScrollStepConverter : IValueConverter
+        {
+            public double Multiplier { get; set; }
+
+            public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
+            {
+                if (!(value is double)) return value;
+                return ((double) value) * Multiplier;
+            }
+
+            public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)
+            {
+                return value;
+            }
+        }
     }
 
     [Flags]
