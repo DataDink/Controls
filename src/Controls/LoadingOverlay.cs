@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Windows;
 using System.Windows.Controls;
+using System.Windows.Data;
 using System.Windows.Documents;
 using System.Windows.Input;
 using System.Windows.Markup;
@@ -18,8 +19,8 @@ namespace Controls
         public static readonly DependencyProperty ContentProperty = DependencyProperty.Register("Content", typeof(Visual), typeof(LoadingOverlay), new PropertyMetadata(ContentSet));
         public Visual Content { get { return (Visual)GetValue(ContentProperty); } set { SetValue(ContentProperty, value); } }
 
-        public static readonly DependencyProperty OverlayTemplateProperty = DependencyProperty.Register("OverlayTemplate", typeof (ControlTemplate), typeof (LoadingOverlay), new PropertyMetadata(OverlaySet));
-        public ControlTemplate OverlayTemplate { get { return (ControlTemplate) GetValue(OverlayTemplateProperty); } set { SetValue(OverlayTemplateProperty, value); } }
+        public static readonly DependencyProperty TemplateProperty = DependencyProperty.Register("Template", typeof(ControlTemplate), typeof(LoadingOverlay), new PropertyMetadata(OverlaySet));
+        public ControlTemplate Template { get { return (ControlTemplate)GetValue(TemplateProperty); } set { SetValue(TemplateProperty, value); } }
 
         public static readonly DependencyProperty IsLoadingProperty = DependencyProperty.Register("IsLoading", typeof (bool), typeof (LoadingOverlay));
         public bool IsLoading { get { return (bool) GetValue(IsLoadingProperty); } set { SetValue(IsLoadingProperty, value); } }
@@ -39,23 +40,69 @@ namespace Controls
         public LoadingOverlay()
         {
             _adorner = new LoaderAdorner(this);
+            var template = new ControlTemplate { VisualTree = new FrameworkElementFactory(typeof(LoadingSpinner)) };
+            template.Seal();
+            Template = template;
+            Loaded += (s, e) => AdornerLayer.GetAdornerLayer(this).Add(_adorner);
+            _adorner.SetBinding(UIElement.VisibilityProperty, new Binding("IsLoading") {
+                Source = this,
+                Converter = new BooleanToVisibilityConverter(),
+                Mode = BindingMode.OneWay
+            });
         }
-
-        private readonly LoaderAdorner _adorner;
 
         private static void ContentSet(DependencyObject sender, DependencyPropertyChangedEventArgs e)
         {
-            var parent = sender as LoadingOverlay;
-            if (parent == null) return;
+            var overlay = sender as LoadingOverlay;
+            if (overlay == null) return;
 
-            var oldchild = e.OldValue as UIElement;
-            if (oldchild != null) {
-                var layer = AdornerLayer.GetAdornerLayer(oldchild);
-                if (layer != null) {
-                    layer.Remove(parent._adorner);
-                }
+            var oldcontent = e.OldValue as Visual;
+            if (oldcontent != null) {
+                overlay.RemoveLogicalChild(oldcontent);
+                overlay.RemoveVisualChild(oldcontent);
             }
+
+            var newcontent = e.NewValue as Visual;
+            if (newcontent != null) {
+                overlay.AddLogicalChild(newcontent);
+                overlay.AddVisualChild(newcontent);
+            }
+
+            overlay.InvalidateArrange();
         }
+
+        private static void OverlaySet(DependencyObject sender, DependencyPropertyChangedEventArgs e)
+        {
+            var overlay = sender as LoadingOverlay;
+            if (overlay == null) return;
+
+            var content = overlay.Template == null ? null : overlay.Template.LoadContent() as UIElement;
+            overlay._adorner.AdornerContent = content;
+
+            overlay.InvalidateArrange();
+        }
+
+        private static void PositionSet(DependencyObject sender, DependencyPropertyChangedEventArgs e)
+        {
+            var overlay = sender as LoadingOverlay;
+            if (overlay == null) return;
+
+            overlay._adorner.InvalidateArrange();
+        }
+
+        protected override Size ArrangeOverride(Size finalSize)
+        {
+            var element = Content as UIElement;
+            if (element != null) {
+                element.Arrange(new Rect(0, 0, finalSize.Width, finalSize.Height));
+            }
+            return finalSize;
+        }
+
+        protected override Visual GetVisualChild(int index) { return Content; }
+        protected override int VisualChildrenCount { get { return Content == null ? 0 : 1; } }
+
+        private readonly LoaderAdorner _adorner;
 
         private class LoaderAdorner : Adorner
         {
@@ -70,6 +117,7 @@ namespace Controls
             {
                 if (Owner == null || AdornerContent == null) return finalSize;
                 var element = AdornerContent as FrameworkElement;
+                if (element == null) return finalSize;
 
                 var finalWidth = finalSize.Width.GetRealOrDefault();
                 var finalHeight = finalSize.Height.GetRealOrDefault();
@@ -119,6 +167,8 @@ namespace Controls
                     adorner.AddLogicalChild(newcontent);
                     adorner.AddVisualChild(newcontent);
                 }
+
+                adorner.InvalidateArrange();
             }
         }
     }

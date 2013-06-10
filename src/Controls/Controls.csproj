@@ -58,10 +58,12 @@
     <Compile Include="Commanding\EventCommand.cs" />
     <Compile Include="DataGridLite.cs" />
     <Compile Include="Extensions\NumberExtensions.cs" />
+    <Compile Include="Extensions\PointExtensions.cs" />
     <Compile Include="Interface\IContentHost.cs" />
     <Compile Include="LiteColumn.cs" />
     <Compile Include="LiteRow.cs" />
     <Compile Include="LoadingOverlay.cs" />
+    <Compile Include="LoadingSpinner.cs" />
     <Compile Include="Properties\AssemblyInfo.cs">
       <SubType>Code</SubType>
     </Compile>

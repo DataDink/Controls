@@ -2,7 +2,7 @@
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml" xmlns:U="clr-namespace:Controls;assembly=Controls"
         xmlns:L="clr-namespace:Controls.Wpf"
-        Title="MainWindow" Height="900" Width="1000">
+        Title="MainWindow" Height="724" Width="1000">
     <Window.Resources>
         <ControlTemplate x:Key="LiteCell">
             <Border BorderBrush="Blue"
@@ -41,6 +41,20 @@
                 <U:LiteColumn Width="100" Title="Column 2" DataMember="Value2" CellTemplate="{StaticResource LiteCell}"/>
                 <U:LiteColumn Title="Column 3" DataMember="Value3" CellTemplate="{StaticResource LiteCell}"/>
             </U:DataGridLite>
+        </GroupBox>
+        
+        <GroupBox Width="400"
+                  Height="300"
+                  Margin="10"
+                  Header="LoadingOverlay">
+            <U:LoadingOverlay Left="0" Right="0" Top="0" Bottom="0" IsLoading="True">
+                <Border BorderBrush="Blue"
+                        BorderThickness="2"
+                        Background="LightGray"
+                        CornerRadius="100">
+                    
+                </Border>
+            </U:LoadingOverlay>
         </GroupBox>
     </WrapPanel>
 </Window>
