@@ -19,6 +19,9 @@ namespace Controls.Wpf
     /// </summary>
     public partial class MainWindow : Window
     {
+        public static readonly DependencyProperty ToggleProperty = DependencyProperty.Register("Toggle", typeof (bool), typeof (MainWindow), new PropertyMetadata(true));
+        public bool Toggle { get { return (bool) GetValue(ToggleProperty); } set { SetValue(ToggleProperty, value); } }
+
         public List<TestDataItem> Items
         {
             get
@@ -128,6 +131,11 @@ namespace Controls.Wpf
         public MainWindow()
         {
             InitializeComponent();
+        }
+
+        private void Button_Click(object sender, RoutedEventArgs e)
+        {
+            Toggle = !Toggle;
         }
     }
 }

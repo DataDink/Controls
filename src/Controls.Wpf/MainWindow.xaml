@@ -30,6 +30,7 @@
         </ControlTemplate>
     </Window.Resources>
     <WrapPanel>
+        <Button Click="Button_Click">Test</Button>
         <GroupBox Width="400"
                   Height="300"
                   Margin="10"
@@ -46,7 +47,7 @@
                   Height="300"
                   Margin="10"
                   Header="LoadingOverlay">
-            <U:LoadingOverlay Left="0" Right="0" Top="0" Bottom="0" IsLoading="True">
+            <U:LoadingOverlay Left="0" Right="0" Top="0" Bottom="0" IsLoading="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType=L:MainWindow}, Path=Toggle}">
                 <U:LoadingOverlay.Template>
                     <ControlTemplate>
                         <U:LoadingSpinner Fill="#80FFFF80" Stroke="#FF000000" StrokeThickness="2" SegmentCount="3" SegmentWidth="45" SegmentLength=".5" SpinnerRadius="150" SpinnerSpeed="00:00:05"/>

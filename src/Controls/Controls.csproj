@@ -56,6 +56,7 @@
     <Compile Include="Collections\ContentCollection.cs" />
     <Compile Include="Collections\ObservableList.cs" />
     <Compile Include="Commanding\EventCommand.cs" />
+    <Compile Include="Converters\InversionConverter.cs" />
     <Compile Include="DataGridLite.cs" />
     <Compile Include="Extensions\NumberExtensions.cs" />
     <Compile Include="Extensions\PointExtensions.cs" />

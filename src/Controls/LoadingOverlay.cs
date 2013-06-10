@@ -10,6 +10,7 @@ using System.Windows.Input;
 using System.Windows.Markup;
 using System.Windows.Media;
 using Controls.Commanding;
+using Controls.Converters;
 
 namespace Controls
 {
@@ -60,12 +61,26 @@ namespace Controls
             if (oldcontent != null) {
                 overlay.RemoveLogicalChild(oldcontent);
                 overlay.RemoveVisualChild(oldcontent);
+                var oldelement = oldcontent as UIElement;
+                if (oldelement != null) {
+                    BindingOperations.ClearBinding(oldelement, FocusManager.IsFocusScopeProperty);
+                }
             }
 
             var newcontent = e.NewValue as Visual;
             if (newcontent != null) {
                 overlay.AddLogicalChild(newcontent);
                 overlay.AddVisualChild(newcontent);
+                var newelement = newcontent as UIElement;
+                if (newelement != null) {
+                    BindingOperations.SetBinding(newelement,
+                        FocusManager.IsFocusScopeProperty,
+                        new Binding("IsVisible") {
+                            Source = overlay._adorner, 
+                            Mode = BindingMode.OneWay,
+                            Converter = new InversionConverter(),
+                        });
+                }
             }
 
             overlay.InvalidateArrange();
