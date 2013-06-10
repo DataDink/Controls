@@ -112,6 +112,11 @@ namespace Controls
             public LoadingOverlay Owner { get; private set; }
 
             public LoaderAdorner(LoadingOverlay owner) : base(owner) { Owner = owner; }
+
+            protected override HitTestResult HitTestCore(PointHitTestParameters hitTestParameters)
+            {
+                return new PointHitTestResult(this, hitTestParameters.HitPoint);
+            }
             
             protected override Size ArrangeOverride(Size finalSize)
             {

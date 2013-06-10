@@ -129,12 +129,5 @@ namespace Controls.Wpf
         {
             InitializeComponent();
         }
-
-        private void Button_Click(object sender, RoutedEventArgs e)
-        {
-            var container = Content as DockPanel;
-            var grid = container.Children.OfType<DataGridLite>().FirstOrDefault();
-            grid.SelectedCells = new[] {grid.Cells.Skip(4).First()};
-        }
     }
 }

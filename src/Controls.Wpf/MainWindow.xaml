@@ -42,19 +42,33 @@
                 <U:LiteColumn Title="Column 3" DataMember="Value3" CellTemplate="{StaticResource LiteCell}"/>
             </U:DataGridLite>
         </GroupBox>
-        
         <GroupBox Width="400"
                   Height="300"
                   Margin="10"
                   Header="LoadingOverlay">
             <U:LoadingOverlay Left="0" Right="0" Top="0" Bottom="0" IsLoading="True">
+                <U:LoadingOverlay.Template>
+                    <ControlTemplate>
+                        <U:LoadingSpinner Fill="#80FFFF80" Stroke="#FF000000" StrokeThickness="2" SegmentCount="3" SegmentWidth="45" SegmentLength=".5" SpinnerRadius="150" SpinnerSpeed="00:00:05"/>
+                    </ControlTemplate>
+                </U:LoadingOverlay.Template>
                 <Border BorderBrush="Blue"
                         BorderThickness="2"
                         Background="LightGray"
-                        CornerRadius="100">
-                    
+                        Margin="10"
+                        CornerRadius="10">
+                    <WrapPanel>
+                        <TextBox Width="300" Margin="25"/>
+                        <TextBox Width="300" Margin="25"/>
+                        <TextBox Width="300" Margin="25"/>
+                    </WrapPanel>
                 </Border>
             </U:LoadingOverlay>
         </GroupBox>
+        
+        <Border Width="500"
+                Height="500">
+            <Ellipse/>
+        </Border>
     </WrapPanel>
 </Window>
