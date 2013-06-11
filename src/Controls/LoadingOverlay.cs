@@ -63,7 +63,7 @@ namespace Controls
                 overlay.RemoveVisualChild(oldcontent);
                 var oldelement = oldcontent as UIElement;
                 if (oldelement != null) {
-                    BindingOperations.ClearBinding(oldelement, FocusManager.IsFocusScopeProperty);
+                    BindingOperations.ClearBinding(oldelement, IsEnabledProperty);
                 }
             }
 
@@ -74,9 +74,9 @@ namespace Controls
                 var newelement = newcontent as UIElement;
                 if (newelement != null) {
                     BindingOperations.SetBinding(newelement,
-                        FocusManager.IsFocusScopeProperty,
-                        new Binding("IsVisible") {
-                            Source = overlay._adorner, 
+                        IsEnabledProperty,
+                        new Binding("IsLoading") {
+                            Source = overlay, 
                             Mode = BindingMode.OneWay,
                             Converter = new InversionConverter(),
                         });
