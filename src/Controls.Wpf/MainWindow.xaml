@@ -28,13 +28,15 @@
                 <TextBlock Text="{Binding}"/>
             </Border>
         </ControlTemplate>
+        <Style TargetType="GroupBox">
+            <Setter Property="Width" Value="400"/>
+            <Setter Property="Height" Value="300"/>
+            <Setter Property="Margin" Value="10"/>
+        </Style>
     </Window.Resources>
     <WrapPanel>
         <Button Click="Button_Click">Test</Button>
-        <GroupBox Width="400"
-                  Height="300"
-                  Margin="10"
-                  Header="DataGridLite">
+        <GroupBox Header="DataGridLite">
             <U:DataGridLite Margin="10" 
                             SelectionMode="MultiRow"
                             Items="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType=L:MainWindow}, Path=Items}">
@@ -43,10 +45,7 @@
                 <U:LiteColumn Title="Column 3" DataMember="Value3" CellTemplate="{StaticResource LiteCell}"/>
             </U:DataGridLite>
         </GroupBox>
-        <GroupBox Width="400"
-                  Height="300"
-                  Margin="10"
-                  Header="LoadingOverlay">
+        <GroupBox Header="LoadingOverlay">
             <U:LoadingOverlay Left="0" Right="0" Top="0" Bottom="0" IsLoading="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType=L:MainWindow}, Path=Toggle}">
                 <U:LoadingOverlay.Template>
                     <ControlTemplate>
@@ -66,10 +65,11 @@
                 </Border>
             </U:LoadingOverlay>
         </GroupBox>
-        
-        <Border Width="500"
-                Height="500">
-            <Ellipse/>
-        </Border>
+
+        <GroupBox Header="TouchContainer (requires touch screen)">
+            <U:TouchContainer Width="375" Height="275" >
+                <Ellipse Fill="Blue"/>
+            </U:TouchContainer>
+        </GroupBox>
     </WrapPanel>
 </Window>

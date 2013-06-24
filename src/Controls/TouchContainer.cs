@@ -232,7 +232,7 @@ namespace Controls
         /// </summary>
         public double FlickYMax { get { return (double)GetValue(FlickYMaxProperty); } set { SetValue(FlickYMaxProperty, value); } }
 
-        public static readonly DependencyProperty WeightProperty = DependencyProperty.Register("Weight", typeof(double), typeof(TouchContainer), new PropertyMetadata(default(double)));
+        public static readonly DependencyProperty WeightProperty = DependencyProperty.Register("Weight", typeof(double), typeof(TouchContainer), new PropertyMetadata(5d));
         /// <summary>
         /// Get/Set a value effecting deceleration of manipulations
         /// </summary>
